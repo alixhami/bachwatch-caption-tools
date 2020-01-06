@@ -1,0 +1,33 @@
+{
+    "name": "Caption Grabber",
+    "version": "0.1",
+    "description": "Fetch captions from streaming websites.",
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "all_frames": false,
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
+    "permissions": [
+        "declarativeContent",
+        "storage",
+        "activeTab",
+        "downloads"
+    ],
+    "page_action": {
+        "default_icon": "transcript.png",
+        "default_popup": "popup.html"
+    },
+    "manifest_version": 2
+}
