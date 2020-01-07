@@ -1,43 +1,48 @@
 
 const pageUrl = document.URL;
 let captionSelector;
-let timeSelector;
+let videoSelector;
+const config = { attributes: false, childList: true, subtree: true, characterData: true };;
 
 console.log(pageUrl);
-if (pageUrl.includes('netflix.com')) {
-    captionSelector = "div.player-timedtext > div.player-timedtext-text-container";
-    timeSelector = "time.time__remaining-time"
+if (pageUrl.includes('tubitv.com')) {
+    captionSelector = "#captionsComponent";
+    videoSelector = "video#videoPlayerComponent";
 } else if (pageUrl.includes('hulu.com')) {
-    captionSelector = "div.closed-caption-outband > div.caption-text-box > p";
-    timeSelector = "span.controls__time-elapsed";
+    captionSelector = "div.closed-caption-outband";
+    videoSelector = "video.video-player.content-video-player";
 } else if (pageUrl.includes('amazon.com')) {
     captionSelector = "span.timedTextWindow > span.timedTextBackground";
-    timeSelector = "div.infoBar.flexRow div.left div.time";
-} else if (pageUrl.includes('tubitv.com')) {
-    captionSelector = "#captionsComponent";
-    timeSelector = "div._1AATa span:first-child";
+    videoSelector = "div.scalingVideoContainer video";
+} else if (pageUrl.includes('netflix.com')) {
+    captionSelector = "div.player-timedtext";
+    videoSelector = "video"
+
 }
 
 let captionNode;
-let timeNode;
-const config = { attributes: true, childList: true, subtree: true };
+let videoNode;
+
 
 const observer = new MutationObserver(() => {
+    videoNode = document.querySelector(videoSelector);
     chrome.runtime.sendMessage({
         "msg": "newCaption",
         "from": "content",
-        "timestamp": timeNode.innerText,
+        "timestamp": videoNode.currentTime,
         "caption": captionNode.innerText
     });
+    console.log(videoNode.currentTime);
+    console.log(captionNode.innerText);
 });
 
 chrome.runtime.onMessage.addListener(
     (request, sender) => {
         if (request.from === "popup" && request.msg === "recordTranscript") {
             captionNode = document.querySelector(captionSelector);
-            timeNode = document.querySelector(timeSelector);
             observer.observe(captionNode, config);
             console.log("listening for changes");
+
 
         } else if (request.from === "popup" && request.msg === "stopTranscript") {
             observer.disconnect();

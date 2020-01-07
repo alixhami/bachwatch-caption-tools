@@ -1,15 +1,6 @@
 let recordButton = document.getElementById("record");
 let downloadButton = document.getElementById("download");
 
-chrome.runtime.onMessage.addListener((request, sender) => {
-    if (request.from === "content" && request.msg === "newCaption") {
-        let newCaption = {};
-        newCaption[request.timestamp] = request.caption;
-        chrome.storage.local.set(newCaption, () => {
-            console.log("stored new caption!");
-        })
-    }
-});
 
 const downloadData = () => {
     chrome.storage.local.get(null, function (items) {

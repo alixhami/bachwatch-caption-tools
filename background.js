@@ -23,3 +23,12 @@ chrome.runtime.onInstalled.addListener(function () {
         ]);
     });
 });
+chrome.runtime.onMessage.addListener((request, sender) => {
+    if (request.from === "content" && request.msg === "newCaption") {
+        let newCaption = {};
+        newCaption[request.timestamp] = request.caption;
+        chrome.storage.local.set(newCaption, () => {
+            console.log("stored new caption!");
+        })
+    }
+});
