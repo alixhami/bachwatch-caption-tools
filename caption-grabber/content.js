@@ -26,14 +26,15 @@ let videoNode;
 
 const observer = new MutationObserver(() => {
     videoNode = document.querySelector(videoSelector);
-    chrome.runtime.sendMessage({
+    result = chrome.runtime.sendMessage({
         "msg": "newCaption",
         "from": "content",
         "timestamp": videoNode.currentTime,
         "caption": captionNode.innerText
+    }, () => {
+        console.log(videoNode.currentTime);
+        console.log(captionNode.innerText);
     });
-    console.log(videoNode.currentTime);
-    console.log(captionNode.innerText);
 });
 
 chrome.runtime.onMessage.addListener(

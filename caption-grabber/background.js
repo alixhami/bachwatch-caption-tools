@@ -23,12 +23,37 @@ chrome.runtime.onInstalled.addListener(function () {
         ]);
     });
 });
-chrome.runtime.onMessage.addListener((request, sender) => {
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log("got msg");
     if (request.from === "content" && request.msg === "newCaption") {
         let newCaption = {};
-        newCaption[request.timestamp] = request.caption;
+        newCaption[request.timestamp.toString()] = request.caption;
         chrome.storage.local.set(newCaption, () => {
-            console.log("stored new caption!");
+            console.log(newCaption);
         })
+    }
+});
+
+const downloadData = () => {
+    chrome.storage.local.get(null, function (items) {
+        const result = JSON.stringify(items);
+        const url = 'data:application/json;base64,' + btoa(result);
+        chrome.downloads.download({
+            url: url,
+            filename: 'captionTranscript.json',
+            saveAs: true
+        });
+    });
+}
+
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.from === "popup" && request.msg === "downloadTranscript") {
+        downloadData();
+        chrome.storage.local.clear(function () {
+            console.log("All clear! Ready to record captions");
+        });
     }
 });

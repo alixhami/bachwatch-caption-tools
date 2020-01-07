@@ -2,18 +2,9 @@ let recordButton = document.getElementById("record");
 let downloadButton = document.getElementById("download");
 
 
-const downloadData = () => {
-    chrome.storage.local.get(null, function (items) {
-        const result = JSON.stringify(items);
-        const url = 'data:application/json;base64,' + btoa(result);
-        chrome.downloads.download({
-            url: url,
-            filename: 'captionTranscript.json'
-        });
-    });
-}
+
 recordButton.onclick = () => {
-    console.log("recording!")
+    recordButton.disabled = true;
     chrome.tabs.query({
         active: true,
         currentWindow: true
@@ -26,6 +17,7 @@ recordButton.onclick = () => {
 }
 
 downloadButton.onclick = () => {
+    recordButton.disabled = false;
     chrome.tabs.query({
         active: true,
         currentWindow: true
@@ -34,10 +26,7 @@ downloadButton.onclick = () => {
             tabs[0].id,
             { "from": "popup", "msg": "stopTranscript" }
         )
-        downloadData();
-        chrome.storage.local.clear(function () {
-            console.log("All clear! Ready to record captions");
-        });
     })
+    chrome.runtime.sendMessage({ "from": "popup", "msg": "downloadTranscript" });
 }
 
